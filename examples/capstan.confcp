@@ -1,0 +1,96 @@
+{
+    "UUID": "123456",
+    "ResultsDir": "/tmp/capstan",
+    "Provider": "aliyun",
+    "Address": "0.0.0.0:8080",
+    "PushgatewayEndpoint": "http://<Your-HostIP>:9091",
+    "Steps": 10,
+    "Namespace": "capstan",
+    "Workloads": [
+        {
+            "name": "nginx",
+            "helm": {
+                "name": "chart1",
+                "set": "imageTag=1.7.9",
+                "chart": "charts/nginx-0.1.0.tgz"
+            },
+            "frequency": 5,
+            "testTool": {
+                "name": "wrk",
+                "script": "scripts/wrk.sh",
+                "steps": 10,
+                "testCaseSet": [
+                    {
+                        "name": "case1",
+                        "affinity": true,
+                        "args": "-t10 -c100 -d30 http://chart1-nginx/",
+                        "metrics": "QPS"
+                    },
+                    {
+                        "name": "case2",
+                        "affinity": false,
+                        "args": "-t10 -c100 -d30 http://chart1-nginx/",
+                        "metrics": "QPS"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "iperf3",
+            "helm": {
+                "name": "chart2",
+                "chart": "charts/iperf3-0.1.0.tgz"
+            },
+            "frequency": 5,
+            "testTool": {
+                "name": "iperf3",
+                "script": "scripts/iperf3.sh",
+                "steps": 10,
+                "testCaseSet": [
+                    {
+                        "name": "case1",
+                        "affinity": true,
+                        "args": "-c chart2-iperf3",
+                        "metrics": "BandWidth"
+                    },
+                    {
+                        "name": "case2",
+                        "affinity": false,
+                        "args": "-c chart2-iperf3",
+                        "metrics": "BandWidth"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "mysql",
+            "helm": {
+                "name": "chart3",
+                "set": "mysqlRootPassword=capstan,persistence.enabled=false",
+                "chart": "stable/mysql"
+            },
+            "frequency": 5,
+            "testTool": {
+                "name": "tpcc-mysql",
+                "script": "scripts/tpcc-mysql.sh",
+                "steps": 10,
+                "testCaseSet": [
+                    {
+                        "name": "case1",
+                        "affinity": true,
+                        "args": "-w1 -c10 -r60 -l60",
+                        "envs": "MYSQL_HOST=chart3-mysql,MYSQL_ROOT_PASSWORD=capstan",
+                        "metrics": "TPMC"
+                    },
+                    {
+                        "name": "case2",
+                        "affinity": false,
+                        "args": "-w1 -c10 -r60 -l60",
+                        "envs": "MYSQL_HOST=chart3-mysql,MYSQL_ROOT_PASSWORD=capstan",
+                        "metrics": "TPMC"
+                    }
+                ]
+            }
+        }
+    ]
+}

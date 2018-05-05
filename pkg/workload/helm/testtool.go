@@ -63,6 +63,7 @@ func (t *TestTool) Run(kubeClient kubernetes.Interface, testCase workload.TestCa
 		return errors.Errorf("helm install failed, ret:%s, error:%v", strings.Join(ret, "\n"), err)
 	}
 
+	time.Sleep(60 * time.Second)
 	// 3. check workload is available or not.
 	err = workload.CheckWorkloadAvailable(kubeClient, t)
 	if err != nil {
@@ -104,7 +105,7 @@ func (t *TestTool) Run(kubeClient kubernetes.Interface, testCase workload.TestCa
 		Name:        testPodName,
 		Namespace:   workload.Namespace,
 		TestingName: testCase.Name,
-		Image:       "wadelee/capstan-base",
+		Image:       "lily123/wordpress-base",
 		Label:       t.Workload.Helm.Name + "-" + t.Workload.Name,
 		Args:        workload.FomatArgs(args),
 	}

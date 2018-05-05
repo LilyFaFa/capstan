@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TARGET = capstan-base
+TARGET = wordpress-base
 REGISTRY ?= lily123
 IMAGE = $(REGISTRY)/$(TARGET)
 DOCKER ?= docker

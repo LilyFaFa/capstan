@@ -18,22 +18,25 @@ FROM debian:jessie
 
 MAINTAINER The ZJU-SEL team
 
-# install git iperf3 mysql-client
+# install erlang mysql-client
 RUN apt-get update && apt-get install -y --force-yes --no-install-recommends \
-    build-essential \
-    ca-certificates \
-    libmysql++-dev \
-    git \
-    iperf3 \
+	wget \
+    tar \
+	perl \
+	erlang \
     mysql-client
 
-# install wrk
-RUN git clone https://github.com/wg/wrk \
-    && cd wrk \
-    && make \
-    && cp wrk /usr/local/bin/wrk \
-    && cd .. \
-    && rm -rf wrk
+# install tsung
+RUN wget http://tsung.erlang-projects.org/dist/tsung-1.7.0.tar.gz 
+RUN tar -zxf tsung-1.7.0.tar.gz 
+RUN cd tsung-1.7.0 \
+    && ./configure --prefix=/usr/local/tsung 
+RUN apt-get install -y --force-yes --no-install-recommends make \
+	gcc \
+	libc6-dev
+RUN cd tsung-1.7.0 \
+    && make install \
+	&& mkdir /root/.tsung
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -44,5 +47,6 @@ WORKDIR /root/capstan
 
 COPY --from=capstan-pusher capstan-pusher /root/capstan/capstan-pusher
 COPY wordpress.sql /root/capstan/wordpress.sql
+COPY tsung.xml /root/.tsung/tsung.xml
 COPY run_benchmark.sh /root/capstan/run_benchmark.sh 
 ENTRYPOINT ["./run_benchmark.sh"]
