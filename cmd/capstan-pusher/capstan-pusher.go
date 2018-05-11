@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ZJU-SEL/capstan/pkg/capstan-pusher"
+	"github.com/LilyFaFa/capstan/pkg/capstan-pusher"
 )
 
 func main() {
